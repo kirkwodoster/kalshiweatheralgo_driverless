@@ -5,7 +5,6 @@ urllib3
 python-dotenv
 websockets
 datetime
-selenium
 beautifulsoup4
 pytz
 pandas
@@ -18,5 +17,6 @@ fake_useragent
 gspread
 webdriver-manager
 scikit-learn
-google.oauth2.service_account
-
+cryptography
+selenium_driverless
+zulu

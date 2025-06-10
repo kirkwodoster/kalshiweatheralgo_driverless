@@ -6,6 +6,7 @@ from selenium_driverless import webdriver
 from selenium_driverless.types.by import By
 import asyncio
 import warnings
+import zulu
 
 async def weather_model():
     
@@ -17,22 +18,16 @@ async def weather_model():
                                                           all_markets=all_markets,
                                                           scrape_window=scrape_window,
                                                           )
+    print(all_markets_with_highs)
+    min_zulu, max_zulu = scrape_functions.convert_to_zulu(all_markets_with_highs=all_markets_with_highs)
+    print('min/max', min_zulu, max_zulu)
+    zulu_bolean_check = scrape_functions.zulu_boolean(min_zulu=min_zulu, max_zulu=max_zulu)
+    print('boolean', zulu_bolean_check)
     
-    warnings.filterwarnings("ignore", message="got execution_context_id and unique_context=True")
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless=new')
-    options.add_argument('--no-sandbox')  # Crucial for running as root or in some CI environments
-    options.add_argument('--disable-dev-shm-usage') # Overcomes resource limits in /dev/shm
-    options.add_argument('--disable-gpu') # Often recommended for headless
+    driver = await scrape_functions.initialize_driver()
     
-    driver = None
-    
-    print("Initializing WebDriver...")
-    driver = await webdriver.Chrome(options=options)
-    print("WebDriver initialized.")
-
     while True:
-        
+
         for city in all_markets:
            market = all_markets[city]['SERIES']
            timezone = all_markets[city]['TIMEZONE']
@@ -42,17 +37,20 @@ async def weather_model():
                                                                all_markets_with_highs=all_markets_with_highs,
                                                                city=city
                                                                )
-           if beg_scrape_func:
+
+           if beg_scrape_func and zulu_bolean_check:
                 temperatures, current_temp, date_time = beg_scrape_func
+                print(temperatures, date_time)
+               
                 trade = trade_functions.max_or_trade_criteria_met(
                                                                    current_temp=current_temp,
                                                                    market=market, 
                                                                    yes_price=inputs.yes_price,
                                                                    count=inputs.count,
                                                                    temperatures=temperatures, 
-                                                                   timezone=timezone
+                                                                   timezone=timezone,
+                                                                   lr_length=inputs.lr_length
                                                                    )
-                print(trade)
                 if trade:
                     all_markets_with_highs[city]["TRADE_EXECUTED"] = True
                 

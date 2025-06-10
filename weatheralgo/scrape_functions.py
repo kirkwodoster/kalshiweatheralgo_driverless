@@ -5,10 +5,11 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 import xml.etree.ElementTree as ET
-from google.oauth2.service_account import Credentials
 import logging
 import numpy as np
 from weatheralgo import inputs
+import zulu
+import warnings
 
 async def scrape_nws(driver, url):
     
@@ -164,6 +165,52 @@ async def beg_scrape(driver, all_markets_with_highs, city):
     except Exception as e:
         logging.info(f'beg_scrape: {e}')
            
+def convert_to_zulu(all_markets_with_highs: dict):
+    
+    try:
+        zulu_list = []
+        for i in all_markets_with_highs:
+            all_markets_with_highs[i]["FORECASTED_HIGH_DATE"]
+            zulu_time = zulu.parse(all_markets_with_highs[i]["FORECASTED_HIGH_DATE"])
+            zulu_list.append(zulu_time)
             
+            min_zulu = min(zulu_list)
+            max_zulu = max(zulu_list)
+            print(min_zulu, max_zulu)
+    except Exception as e:
+        logging.info(f'beg_scrape: {e}')
+        
+    return min_zulu, max_zulu
 
+def zulu_boolean(min_zulu, max_zulu):
+    try:
+        current_zulu = zulu.now()
+        
+        begin = inputs.scrape_window[0]
+        end = inputs.scrape_window[1]
+        
+        min_zulu = min_zulu.shift(minutes=-begin)
+        max_zulu = max_zulu.shift(minutes=end)
+        if current_zulu >=  min_zulu and current_zulu <= max_zulu:
+            return True
+        else:
+            return False
+    except Exception as e:
+        logging.info(f'beg_scrape: {e}')
+
+            
+async def initialize_driver():
+    
+    warnings.filterwarnings("ignore", message="got execution_context_id and unique_context=True")
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')  # Crucial for running as root or in some CI environments
+    options.add_argument('--disable-dev-shm-usage') # Overcomes resource limits in /dev/shm
+    options.add_argument('--disable-gpu') # Often recommended for headless
+    
+    print("Initializing WebDriver...")
+    driver = await webdriver.Chrome(options=options)
+    print("WebDriver initialized.")
+    
+    return driver
 

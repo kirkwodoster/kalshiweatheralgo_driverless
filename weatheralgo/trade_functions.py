@@ -59,12 +59,10 @@ def if_temp_reaches_max(current_temp: int, market: str, yes_price: int, count: i
     
 def trade_criteria_met(temperatures: list, lr_length: int, 
                        market: str, yes_price: int, count: int, timezone):
-
     try:
-        
         highest_temp = int(np.array(temperatures).max())
         order_pipeline_check = util_functions.order_pipeline(highest_temp=highest_temp, market=market, timezone=timezone)
-        
+
         if order_pipeline_check:
             x = np.arange(0, lr_length).reshape(-1,1)
             temp_length = temperatures[-lr_length:]
@@ -86,7 +84,7 @@ def trade_criteria_met(temperatures: list, lr_length: int,
         logging.error(f"Error in trade_criteria_met: {e}")
         
     
-def max_or_trade_criteria_met(current_temp: int, market: str, yes_price: int, count: int, temperatures: list, timezone):
+def max_or_trade_criteria_met(current_temp: int, market: str, yes_price: int, count: int, temperatures: list, timezone, lr_length: int):
     
     try:
     
@@ -98,14 +96,16 @@ def max_or_trade_criteria_met(current_temp: int, market: str, yes_price: int, co
                                                 temperatures=temperatures,
                                                 timezone=timezone
                                                 )
+        # print('current temp is max', current_temp_is_max)
         trade_criteria = trade_criteria_met(
                                             temperatures=temperatures, 
                                             market=market,
                                             yes_price=yes_price,
                                             count=count,
                                             timezone=timezone,
+                                            lr_length=lr_length
                                             )
-        
+        # print('trade_criteria_met', trade_criteria_met)
         
         if current_temp_is_max:
             logging.info(f'Max Temperature Reached {market}')

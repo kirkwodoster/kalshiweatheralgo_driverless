@@ -1,11 +1,10 @@
-
 import pytz
 
 lr_length = 7
 hour = 4
 scrape_window = [5000,6000]
 yes_price = 1
-count = 0
+count = 1
 slope_min = 0
 
 

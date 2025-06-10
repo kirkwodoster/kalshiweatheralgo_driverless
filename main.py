@@ -26,8 +26,8 @@ from weatheralgo import scrape_functions
 
 from weatheralgo.clients import client
 from weatheralgo.model import weather_model
-
-
+from selenium_driverless import webdriver
+import warnings
 
 # Initialize the WebSocket client
 # ws_client = KalshiWebSocketClient(
@@ -43,6 +43,8 @@ from weatheralgo.model import weather_model
 
 if __name__ == "__main__":
     
+
+   
     x = weather_model.weather_model()
     print(x)
     try:
@@ -50,9 +52,14 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Program terminated by user.")
     
-    # x = scrape_functions.xml_scrape(xml_url="https://forecast.weather.gov/MapClick.php?lat=39.8589&lon=-104.6733&FcstType=digitalDWML",
-    #                                 timezone="America/Denver")
-    # print(x)
+    
+    # xml_url = "https://forecast.weather.gov/MapClick.php?lat=39.8589&lon=-104.6733&FcstType=digitalDWML"
+    # timezone = pytz.timezone("America/Denver")
+    # x = scrape_functions.xml_scrape(xml_url=xml_url,
+    #                                 timezone=timezone)
+    
+    # zulu = zulu.parse(x[0])
+    # print(zulu)
     
     # y = scrape_functions.scrape_nws("https://www.weather.gov/wrh/timeseries?site=KDEN&hours=1")
     # print(asyncio.run(y)[0])

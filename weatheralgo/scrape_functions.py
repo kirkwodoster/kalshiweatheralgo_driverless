@@ -8,8 +8,12 @@ import xml.etree.ElementTree as ET
 import logging
 import numpy as np
 from weatheralgo import inputs
+from weatheralgo import util_functions
 import zulu
 import warnings
+
+log_settings = util_functions.logging_settings()
+log_settings
 
 async def scrape_nws(driver, url):
     
@@ -83,7 +87,7 @@ async def scrape_nws(driver, url):
             return temp, datetime  
          
         except Exception as e:
-            print(f"scrape_nws: {e}")
+            logging.info(f"scrape_nws: {e}")
             
 def xml_scrape(xml_url, timezone):
 
@@ -116,8 +120,7 @@ def xml_scrape(xml_url, timezone):
     except Exception as e:
       logging.info(f'xml_scrape: {e}')
       
-    
-    
+
 def dict_of_high(all_markets, scrape_window):
     
     for i in  all_markets:
@@ -141,6 +144,50 @@ def dict_of_high(all_markets, scrape_window):
             
     return all_markets
 
+def forecasted_creation_date_initial(all_markets_with_highs: dict):
+    
+    try:
+        for i in all_markets_with_highs:
+            xml_url =  all_markets_with_highs[i]['XML_URL']
+            response = requests.get(xml_url)
+            root = ET.fromstring(response.content)
+            creation_date = root.findall('.//creation-date')
+            creation_date = creation_date[0].text
+            all_markets_with_highs[i]['FORECASTED_CREATION_DATE'] = creation_date
+        
+    except Exception as e:
+        logging.info(f'forecasted_creation_date_initial: {e}')
+        
+    return all_markets_with_highs
+
+
+def forecasted_creation_date_update(all_markets_with_highs: dict):
+    
+    try:
+        now = datetime.now()
+        
+        if now.minute >= 30 and now.minute <= 35:
+
+            for i in all_markets_with_highs:
+                xml_url =  all_markets_with_highs[i]['XML_URL']
+                response = requests.get(xml_url)
+                root = ET.fromstring(response.content)
+                creation_date = root.findall('.//creation-date')
+                creation_date = creation_date[0].text
+                
+                old_creation_date = all_markets_with_highs[i]['FORECASTED_CREATION_DATE']
+                
+                if creation_date != old_creation_date:
+                    all_markets_with_highs[i]['FORECASTED_CREATION_DATE'] = creation_date
+                    
+                
+        return all_markets_with_highs
+        
+    except Exception as e:
+        logging.info(f'forecasted_creation_date_update: {e}')
+        
+    
+    
 async def beg_scrape(driver, all_markets_with_highs, city):    
     
     try:
@@ -176,7 +223,7 @@ def convert_to_zulu(all_markets_with_highs: dict):
             
             min_zulu = min(zulu_list)
             max_zulu = max(zulu_list)
-            print(min_zulu, max_zulu)
+
     except Exception as e:
         logging.info(f'beg_scrape: {e}')
         

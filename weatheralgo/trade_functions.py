@@ -11,7 +11,22 @@ from weatheralgo.clients import client
 from weatheralgo import util_functions
 from weatheralgo import inputs
 
+log_settings = util_functions.logging_settings()
+log_settings
 
+def market_above_1(market_ticker: str):
+    
+    try:
+
+        orders = client.get_market_order_book(market_ticker)
+        above_1 = orders['orderbook']['yes']
+
+        if above_1 != None:
+            return True
+        
+    except Exception as e:
+        logging.info(f'market_above_1 : {e}')
+        
 
 def trade_execution(market: str, temperatures: list, yes_price: int, count: int, timezone):
     try:
@@ -24,7 +39,10 @@ def trade_execution(market: str, temperatures: list, yes_price: int, count: int,
         balance_min = count * yes_price
         balance = client.get_balance()['balance'] > balance_min
         
-        if balance:          
+        trade_above_1 = market_above_1(market_ticker=market_ticker)
+        print(trade_above_1)
+        
+        if balance and trade_above_1:          
             logging.info('order_pipeline worked')
             order_id = str(uuid.uuid4())
             client.create_order(ticker=market_ticker, client_order_id=order_id,  yes_price=yes_price, count=count)

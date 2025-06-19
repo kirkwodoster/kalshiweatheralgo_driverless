@@ -192,6 +192,10 @@ class KalshiHttpClient(KalshiBaseClient):
         """Retrieves the member's order based on order ID"""
         return self.get(self.portfolio_url + "/orders/" + order_id)
     
+    def get_market_order_book(self,ticker: str)-> Dict[str, Any]:
+        """Retrieves the market order book based on order ID"""
+        return self.get(self.markets_url + f'/{ticker}' + "/orderbook/")
+    
     
     def get_event(
         self,

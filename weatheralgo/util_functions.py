@@ -1,12 +1,11 @@
 import logging
 from datetime import datetime
 import logging
-import gspread
-from google.oauth2.service_account import Credentials
-import pytz
-
 
 from weatheralgo.clients import client
+
+
+
 
 def weather_config(market, timezone): 
     try:
@@ -104,3 +103,5 @@ def logging_settings():
     format="%(asctime)s - %(levelname)s - %(message)s",  # Define the log format
     handlers=[logging.StreamHandler()]  # Output logs to the terminal
 )
+
+logging_settings()

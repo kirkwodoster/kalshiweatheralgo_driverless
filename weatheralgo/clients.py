@@ -18,7 +18,7 @@ load_dotenv()
 class KalshiClient:
     def __init__(self):
         self.env = Environment.PROD
-        self.key_id = '114141f5-a709-4521-8361-28229ff4248b'
+        self.key_id = ''
         self.key_file_path = 'util/api/KalshiKey.txt'
         self.client = self._initialize_client()
 

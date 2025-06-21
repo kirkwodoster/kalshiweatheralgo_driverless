@@ -4,7 +4,7 @@ lr_length = 7
 hour = 4
 scrape_window = [30,90]
 yes_price = 1
-count = 1
+count = 0
 slope_min = 0
 
 
@@ -72,8 +72,4 @@ all_markets = {
         }
 
 market_list = ["KXHIGHDEN", "KXHIGHCHI", "KXHIGHMIA", "KXHIGHAUS", "KXHIGHPHIL", "KXHIGHLAX"]
-
-
-
-    
 

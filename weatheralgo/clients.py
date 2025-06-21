@@ -18,7 +18,7 @@ load_dotenv()
 class KalshiClient:
     def __init__(self):
         self.env = Environment.PROD
-        self.key_id = ''
+        self.key_id = '114141f5-a709-4521-8361-28229ff4248b'
         self.key_file_path = 'util/api/KalshiKey.txt'
         self.client = self._initialize_client()
 
@@ -196,6 +196,10 @@ class KalshiHttpClient(KalshiBaseClient):
         """Retrieves the market order book based on order ID"""
         return self.get(self.markets_url + f'/{ticker}' + "/orderbook/")
     
+    def get_market(self,ticker: str)-> Dict[str, Any]:
+        """Retrieves the market order book based on order ID"""
+        return self.get(self.markets_url + f'/{ticker}')
+    
     
     def get_event(
         self,
@@ -371,17 +375,17 @@ class KalshiWebSocketClient(KalshiBaseClient):
         print("WebSocket connection opened.")
         await self.subscribe_to_tickers()
 
-    async def subscribe_to_tickers(self):
-        """Subscribe to ticker updates for all markets."""
-        subscription_message = {
-            "id": self.message_id,
-            "cmd": "subscribe",
-            "params": {
-                "channels": ["ticker"]
-            }
-        }
-        await self.ws.send(json.dumps(subscription_message))
-        self.message_id += 1
+    # async def subscribe_to_tickers(self):
+    #     """Subscribe to ticker updates for all markets."""
+    #     subscription_message = {
+    #         "id": self.message_id,
+    #         "cmd": "subscribe",
+    #         "params": {
+    #             "channels": ["ticker"]
+    #         }
+    #     }
+    #     await self.ws.send(json.dumps(subscription_message))
+    #     self.message_id += 1
 
     async def handler(self):
         """Handle incoming messages."""
@@ -404,7 +408,59 @@ class KalshiWebSocketClient(KalshiBaseClient):
     async def on_close(self, close_status_code, close_msg):
         """Callback when WebSocket connection is closed."""
         print("WebSocket connection closed with code:", close_status_code, "and message:", close_msg)
+        
+
+    async def subscribe_to_tickers(self, tickers: Optional[list] = None):
+        """Subscribe to ticker updates for all markets or specific tickers.
+
+        Args:
+            tickers (Optional[list]): List of market tickers to subscribe to.
+            
+            If None, subscribes to all markets.
+        """
+        subscription_message = {
+            "id": self.message_id,
+            "cmd": "subscribe",
+            "params": {
+                "channels": ["ticker"]
+            }
+        }
+        
+        if tickers:
+            subscription_message["params"]["market_tickers"] = tickers
+            
+        await self.ws.send(json.dumps(subscription_message))
+        self.message_id += 1
+        
+    async def subscribe_to_fills(self, ticker: Optional[str] = None, tickers: Optional[list] = None):
+        """Subscribe to fill updates.
+        
+        Args:
+            ticker (Optional[str]): Single market ticker to subscribe to.
+            tickers (Optional[list]): List of market tickers to subscribe to.
+            
+            If both are None, subscribes to all markets.
+        """
+        subscription_message = {
+            "id": self.message_id,
+            "cmd": "subscribe",
+            "params": {"channels": ["fill"]}
+        }
+        
+        if ticker:
+            subscription_message["params"]["market_ticker"] = ticker
+        elif tickers:
+            subscription_message["params"]["market_tickers"] = tickers
+            
+        await self.ws.send(json.dumps(subscription_message))
+        self.message_id += 1
 
 
 kalshi_client = KalshiClient()
 client = kalshi_client.get_client()
+
+# ws = KalshiWebSocketClient()
+
+# kalshi_client_instance = KalshiClient()
+# http_client = kalshi_client_instance.get_client()
+# ws_client = kalshi_client_instance.get_websocket_client()

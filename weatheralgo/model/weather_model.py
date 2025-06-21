@@ -31,6 +31,8 @@ async def weather_model():
     
     driver = await scrape_functions.initialize_driver()
     
+    loop_counter = 0
+    
     while True:
         
         all_markets_with_highs = scrape_functions.forecasted_creation_date_update(all_markets_with_highs=all_markets_with_highs)
@@ -64,8 +66,14 @@ async def weather_model():
                                                                    )
                 if trade:
                     all_markets_with_highs[city]["TRADE_EXECUTED"] = True
+            
+            
+        loop_counter += 1
+        if loop_counter >= 40:
+            driver.quit()
+            driver = await scrape_functions.initialize_driver()
                 
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
 
         
                 

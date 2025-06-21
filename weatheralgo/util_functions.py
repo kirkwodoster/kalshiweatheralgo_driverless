@@ -81,20 +81,6 @@ def order_pipeline(highest_temp: int, market: str, timezone):
             logging.info(f"order_pipeline {e}")
     except:
         None
-
-
-# def to_sheets(sheet_name, data_input):
-#     scropes = [
-#     "https://www.googleapis.com/auth/spreadsheets"
-# ]
-#     credentials = 'util\credentials\kalshi-trade-data-f9799409bcc1.json'
-#     creds = Credentials.from_service_account_file(credentials, scopes=scropes)
-#     client = gspread.authorize(creds)
-
-#     sheet_id = "f9799409bcc109173acefbb66a418282592211f3"
-#     sheet = client.open_by_key(sheet_id)
-    
-#     sheet.worksheet(sheet_name).append_rows(data_input)
             
             
 def logging_settings():
